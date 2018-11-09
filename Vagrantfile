@@ -47,3 +47,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         config.hostsupdater.aliases = settings['sites'].map { |site| site['map'] }
     end
 end
+Vagrant.configure("2") do |config|
+	config.vm.network "private_network", ip: "192.168.10.105"
+	config.vm.synced_folder ".", "/vagrant", type: "nfs"
+end
