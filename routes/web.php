@@ -14,3 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+/* ***  Authentication  *** */
+
+Route::get("/register", '\App\Http\Controllers\RegistrationController@create')->name('register');
+Route::post("/register", '\App\Http\Controllers\RegistrationController@store');
