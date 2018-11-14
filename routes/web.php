@@ -17,5 +17,5 @@ Route::get('/', function () {
 
 /* ***  Authentication  *** */
 
-Route::get("/register", '\App\Http\Controllers\RegistrationController@create')->name('register');
-Route::post("/register", '\App\Http\Controllers\RegistrationController@store');
+Route::get("/register", '\App\Http\Controllers\Authentication\RegistrationController@create')->name('register');
+Route::post("/register", '\App\Http\Controllers\Authentication\RegistrationController@store');

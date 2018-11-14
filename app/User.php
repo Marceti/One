@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','remember_token'
+        'name', 'email', 'password'
     ];
 
     /**
@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password','remember_token'
     ];
 
     public function setPasswordAttribute($value)
@@ -33,10 +33,8 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
-    public static function addUnconfirmed($credentials)
+    public function loginToken()
     {
-       return static::create($credentials);
+        return $this->hasOne('App\LoginToken');
     }
-
-
 }

@@ -10,29 +10,27 @@ namespace App\ClassContainer\Authentication;
 
 
 use App\Jobs\RegistrationEmailJob;
+use App\LoginToken;
 use App\User;
 use Illuminate\Http\Request;
 
 class AuthenticatesUser {
 
-    public function invite($credentials)
+    public function invite(Request $request)
     {
-        $token =  $this->createToken();
-
-        $user=User::AddUnconfirmed($credentials+=['remember_token'=>$token]);
-
-        $this->sendRegistrationEmailFor($user);
+        $user=$this->createUser($request);
+        $this->createToken($user)
+            ->sendRegistrationEmail();
     }
 
-
-    private function createToken()
+    private function createUser($request)
     {
-        return str_random(50);
+        return User::Create($request->only(['name','email','password']));
     }
 
-    private function sendRegistrationEmailFor($user)
+    private function createToken($user)
     {
-        $registrationEmail = new RegistrationEmailJob($user);
-        $registrationEmail->dispatch($user);
+        return LoginToken::generateFor($user);
     }
 }
+

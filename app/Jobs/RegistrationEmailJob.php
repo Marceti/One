@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\LoginToken;
 use App\Mail\RegistrationConfirmationEmail;
 use App\User;
 use Illuminate\Bus\Queueable;
@@ -38,7 +39,7 @@ class RegistrationEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $url = url('register/token',$this->user->remember_token);
+        $url = url('register/token',$this->user->loginToken->token);
         Mail::to($this->user)->send(new RegistrationConfirmationEmail($url));
     }
 }

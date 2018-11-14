@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Authentication;
 
 use App\ClassContainer\Authentication\AuthenticatesUser;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,6 @@ class RegistrationController extends Controller
 
     public function store(AuthenticatesUser $auth, RegistrationRequest $request)
     {
-        //request has been validated by RegistrationRequest
-      $auth->invite($request->only(['name','email','password']));
+        $auth->invite($request);
     }
 }
