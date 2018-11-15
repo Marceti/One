@@ -7,7 +7,7 @@
     <title>Laravel</title>
 
 
-    <link href="css\app.css" rel="stylesheet" type="text/css">
+    <link href="\css\app.css" rel="stylesheet" type="text/css">
 
     <!-- Styles -->
 
@@ -49,6 +49,6 @@
 @yield('content')
 
 @include('layouts.partials._errors')
-
+@include('layouts.partials._sessionMessages')
 </body>
 </html>

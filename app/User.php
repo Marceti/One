@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,5 +37,19 @@ class User extends Authenticatable
     public function loginToken()
     {
         return $this->hasOne('App\LoginToken');
+    }
+
+    /**
+     * If user was already authenticated returns FALSE, otherwise will authenticate and return TRUE
+     * @return bool
+     */
+    public function firstAuthentication()
+    {
+        if (! $this->email_verified_at){
+            $this->email_verified_at=Carbon::now();
+            $this->save();
+            return true;
+        }
+        return false;
     }
 }

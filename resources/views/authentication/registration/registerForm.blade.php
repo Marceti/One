@@ -7,7 +7,7 @@
 
             {{csrf_field()}}
 
-            <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+            <h1 class="h3 mb-3 font-weight-normal">Registration</h1>
 
             <div class="form-group">
                 <label for="name">Name:</label>

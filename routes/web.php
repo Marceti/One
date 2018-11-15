@@ -19,3 +19,7 @@ Route::get('/', function () {
 
 Route::get("/register", '\App\Http\Controllers\Authentication\RegistrationController@create')->name('register');
 Route::post("/register", '\App\Http\Controllers\Authentication\RegistrationController@store');
+Route::get("/register/token/{token}", '\App\Http\Controllers\Authentication\RegistrationController@authenticate');
+
+Route::get("/login",'\App\Http\Controllers\Authentication\SessionsController@create')->name('login');
+Route::post("/login",'\App\Http\Controllers\Authentication\SessionsController@store');
