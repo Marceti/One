@@ -11,15 +11,21 @@ namespace App\ClassContainer;
 
 class sessionManager {
 
-    public static function addMessage($message)
+    public static function addKey($key,$message)
     {
-        session(['message'=>$message]);
+        session([$key=>$message]);
 
     }
 
     public static function flashMessage($message)
     {
         session()->flash('message',$message);
+    }
+
+    public static function rememberUser($credentials)
+    {
+        static::addKey("user_email",$credentials['email']);
+        static::addKey("user_password",$credentials['password']);
     }
 
 

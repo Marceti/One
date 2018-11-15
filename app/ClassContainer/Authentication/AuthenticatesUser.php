@@ -36,11 +36,14 @@ class AuthenticatesUser {
     }
 
     /**
+     * Saves the credentials if remember-me is on , and creates uconfirmed user
      * @param $request
      * @return mixed
      */
     private function createUser($request)
     {
+        if ($request->has('remember-me')) {SessionManager::rememberUser($request->only(['email','password']));}
+
         return User::Create($request->only(['name','email','password']));
     }
 

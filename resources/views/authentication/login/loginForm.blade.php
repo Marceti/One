@@ -15,12 +15,12 @@
 
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" class="form-control" name="email" placeholder="Your Email Here" required>
+                        <input type="email" class="form-control" name="email" placeholder="Your Email Here" required value={{session('user_email')}}>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password:</label>
-                        <input type="password" class="form-control" name="password" placeholder="Your Password Here" required>
+                        <input type="password" class="form-control" name="password" placeholder="Your Password Here" required value={{session('user_password')}}>
                     </div>
                     <div class="form-group">
                                 <button type="submit" class="btn btn-primary btn-lg btn btn-block">Login</button>
