@@ -15,5 +15,8 @@ return [
 
     'already_confirmed' => 'This user :user is active',
     'confirmation' => 'Thank you for your registration :user. Enjoy',
-    'please_confirm' => 'Thank you ! Now please confirm your email adress by accesing the link'
+    'please_confirm' => 'Thank you ! Now please confirm your email adress by accesing the link',
+    'credentials_check' => 'Please check your credentials',
+    'email_confirmation' => 'Please confirm your email adress , click on the link that was sent to your email adress',
+
 ];

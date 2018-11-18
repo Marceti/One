@@ -11,9 +11,11 @@
 |
 */
 
+use Illuminate\Support\Facades\Auth;
+
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('welcomeOne');
+})->name('out');
 
 /* ***  Authentication  *** */
 
@@ -23,3 +25,8 @@ Route::get("/register/token/{token}", '\App\Http\Controllers\Authentication\Regi
 
 Route::get("/login",'\App\Http\Controllers\Authentication\SessionsController@create')->name('login');
 Route::post("/login",'\App\Http\Controllers\Authentication\SessionsController@store');
+Route::get("/logout",'\App\Http\Controllers\Authentication\SessionsController@destroy')->name('logout');
+
+/* ***  Regular Users  *** */
+
+Route::get('/home','\App\Http\Controllers\HomeController@index')->name('home');

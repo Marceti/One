@@ -14,6 +14,7 @@ use App\LoginToken;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use App\ClassContainer\SessionManager;
 
@@ -42,7 +43,10 @@ class AuthenticatesUser {
      */
     private function createUser($request)
     {
-        if ($request->has('remember-me')) {SessionManager::rememberUser($request->only(['email','password']));}
+        if ($request->has('remember-me'))
+        {
+            SessionManager::rememberUser($request->only(['email', 'password']));
+        }
 
         return User::Create($request->only(['name','email','password']));
     }
@@ -74,5 +78,30 @@ class AuthenticatesUser {
 
         return redirect()->route('login');
     }
+
+    public function login(Request $request)
+    {
+
+        $credentials=$request->only(['email','password']);
+
+        if ($request->has('remember-me'))
+        {
+            SessionManager::rememberUser($credentials);
+        }
+
+        if (!Auth::attempt($credentials)) {
+            SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
+            return redirect()->back();
+        }
+        return redirect()->intended('home');
+    }
+
+    public function logOut()
+    {
+        Auth::logout();
+        return redirect()->route('out');
+    }
+
+
 }
 

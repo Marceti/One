@@ -52,4 +52,12 @@ class User extends Authenticatable
         }
         return false;
     }
+
+    public function isEmailVerified()
+    {
+        if (! $this->email_verified_at){
+            return true;
+        }
+        return false;
+    }
 }
