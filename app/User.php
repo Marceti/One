@@ -34,6 +34,10 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
+    /**
+     * One to One realtionship
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function loginToken()
     {
         return $this->hasOne('App\LoginToken');
@@ -53,11 +57,27 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * Checks if the user has email verified
+     * @return bool
+     */
     public function isEmailVerified()
     {
-        if (! $this->email_verified_at){
-            return true;
-        }
-        return false;
+        return true && $this->email_verified_at;
+    }
+
+    /**
+     * Retreves user by name
+     * @param $name
+     * @return null
+     */
+    public static function byName($name)
+    {
+        return static::where('name',$name)->first();
+    }
+
+    public static function byEmail($email)
+    {
+        return static::where('email',$email)->first();
     }
 }

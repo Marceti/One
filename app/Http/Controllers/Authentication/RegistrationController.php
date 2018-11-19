@@ -8,11 +8,11 @@ use App\Http\Requests\RegistrationRequest;
 use App\LoginToken;
 use Illuminate\Http\Request;
 
-class RegistrationController extends Controller
-{
+class RegistrationController extends Controller {
+
     public function __construct()
     {
-        $this->middleware('guest',['except'=>'destroy']);
+        $this->middleware('guest', ['except' => 'destroy']);
     }
 
     public function create()
@@ -25,7 +25,7 @@ class RegistrationController extends Controller
         return $auth->invite($request);
     }
 
-    public function authenticate(AuthenticatesUser $auth,LoginToken $token)
+    public function authenticate(AuthenticatesUser $auth, LoginToken $token)
     {
         return $auth->authenticate($token);
     }

@@ -20,6 +20,13 @@ use App\ClassContainer\SessionManager;
 
 class AuthenticatesUser {
 
+
+    private $authConditions = ['noExtraChecks', 'emailVerification'];
+    // $authConditions [] =[ , , ]
+    //                  noExtraChecks       :   no extra checks are necesary
+    //                  emailVerification   :   the user must have the email verified
+    //
+
     /**
      * Invites the user by : creating user, creating token for this user, sending invite email with token link
      * @param Request $request
@@ -27,7 +34,8 @@ class AuthenticatesUser {
      */
     public function invite(Request $request)
     {
-        $user=$this->createUser($request);
+        $user = $this->createUser($request);
+
         $this->createToken($user)
             ->sendRegistrationEmail();
 
@@ -37,18 +45,61 @@ class AuthenticatesUser {
     }
 
     /**
+     * Authenticates user with the given token
+     * @param LoginToken $token
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function authenticate(LoginToken $token)
+    {
+        $user = $token->user;
+
+        if ($user->firstAuthentication())
+        {
+            $message = Lang::get('authentication.confirmation', ['name' => $user->name]);
+        } else
+        {
+            $message = Lang::get('authentication.already_confirmed', ['name' => $user->name]);
+        };
+
+        SessionManager::flashMessage($message);
+
+        return redirect()->route('login');
+    }
+
+    /**
+     * Attempts to Log in the user
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function login(Request $request)
+    {
+        $this->rememberUser($request);
+
+        return $this->loginAttempt($request);
+    }
+
+    /**
+     * Logs out the user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logOut()
+    {
+        Auth::logout();
+
+        return redirect()->route('home');
+    }
+
+
+    /**
      * Saves the credentials if remember-me is on , and creates uconfirmed user
      * @param $request
      * @return mixed
      */
     private function createUser($request)
     {
-        if ($request->has('remember-me'))
-        {
-            SessionManager::rememberUser($request->only(['email', 'password']));
-        }
+        $this->rememberUser($request);
 
-        return User::Create($request->only(['name','email','password']));
+        return User::Create($request->only(['name', 'email', 'password']));
     }
 
     /**
@@ -61,45 +112,63 @@ class AuthenticatesUser {
     }
 
     /**
-     * Authenticates user with the given token
-     * @param LoginToken $token
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * If checkbox , remembers the user in current session
+     * @param $request
      */
-    public function authenticate(LoginToken $token)
+    private function rememberUser($request)
     {
-        $user=$token->user;
-
-        if ($user->firstAuthentication()){
-            $message = Lang::get('authentication.confirmation',['name' => $user->name]);
+        if ($request->has('remember-me'))
+        {
+            SessionManager::rememberUser($request->only(['email', 'password']));
         }
-        else {$message = Lang::get('authentication.already_confirmed',['name' => $user->name]);};
+    }
 
-        SessionManager::flashMessage($message);
+    private function loginAttempt($request)
+    {
+        $user = User::byEmail($request->input('email'));
+
+        if ($user && $this->loginConditions($user))
+        {
+            if (Auth::attempt($request->only(['email', 'password'])))
+            {
+                return redirect()->intended(request('home'));
+            }
+        };
+
+        SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
 
         return redirect()->route('login');
     }
 
-    public function login(Request $request)
+    private function loginConditions(User $user)
+    : bool
     {
+        $conditionResult = true;
 
-        $credentials=$request->only(['email','password']);
-
-        if ($request->has('remember-me'))
+        foreach ($this->authConditions as $condition)
         {
-            SessionManager::rememberUser($credentials);
+            $conditionResult &= $this->loginCondition($user, $condition);
         }
 
-        if (!Auth::attempt($credentials)) {
-            SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
-            return redirect()->back();
-        }
-        return redirect()->intended('home');
+        return $conditionResult;
     }
 
-    public function logOut()
+    private function loginCondition(User $user, $condition)
+    : bool
     {
-        Auth::logout();
-        return redirect()->route('out');
+        switch ($condition)
+        {
+            case "noExtraChecks":
+                return true;
+                break;
+
+            case "emailVerification":
+                return $user->isEmailVerified();
+                break;
+
+            default:
+                return false;
+        }
     }
 
 

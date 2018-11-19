@@ -13,9 +13,6 @@
 
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    return view('welcomeOne');
-})->name('out');
 
 /* ***  Authentication  *** */
 
@@ -23,10 +20,10 @@ Route::get("/register", '\App\Http\Controllers\Authentication\RegistrationContro
 Route::post("/register", '\App\Http\Controllers\Authentication\RegistrationController@store');
 Route::get("/register/token/{token}", '\App\Http\Controllers\Authentication\RegistrationController@authenticate');
 
-Route::get("/login",'\App\Http\Controllers\Authentication\SessionsController@create')->name('login');
-Route::post("/login",'\App\Http\Controllers\Authentication\SessionsController@store');
-Route::get("/logout",'\App\Http\Controllers\Authentication\SessionsController@destroy')->name('logout');
+Route::get("/login", '\App\Http\Controllers\Authentication\SessionsController@create')->name('login');
+Route::post("/login", '\App\Http\Controllers\Authentication\SessionsController@store');
+Route::get("/logout", '\App\Http\Controllers\Authentication\SessionsController@destroy')->name('logout');
 
-/* ***  Regular Users  *** */
+/* ***  Regular  *** */
 
-Route::get('/home','\App\Http\Controllers\HomeController@index')->name('home');
+Route::get("/", '\App\Http\Controllers\HomeController@index')->name('home');

@@ -7,12 +7,11 @@ use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class SessionsController extends Controller
-{
+class SessionsController extends Controller {
 
     public function __construct()
     {
-        $this->middleware('guest',['except'=>'destroy']);
+        $this->middleware('guest', ['except' => 'destroy']);
     }
 
     public function create()
@@ -20,7 +19,7 @@ class SessionsController extends Controller
         return view("authentication.login.loginForm");
     }
 
-    public function store(LoginRequest $request,AuthenticatesUser $auth)
+    public function store(LoginRequest $request, AuthenticatesUser $auth)
     {
         return $auth->login($request);
     }

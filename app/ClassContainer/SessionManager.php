@@ -19,7 +19,11 @@ class sessionManager {
 
     public static function flashMessage($message)
     {
-        session()->flash('message',$message);
+        $messages=session('message');
+        $messages[]=$message;
+
+        session()->flash('message',$messages);
+
     }
 
     public static function rememberUser($credentials)
