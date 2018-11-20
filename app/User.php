@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Mockery\Exception;
 
 class User extends Authenticatable
 {
@@ -67,17 +68,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Retreves user by name
-     * @param $name
-     * @return null
+     * retreves user by email
+     * @param $email
+     * @return mixed
+     * @throws \Exception
      */
-    public static function byName($name)
+    public static function byEmail($email, $callBack = null )
     {
-        return static::where('name',$name)->first();
-    }
-
-    public static function byEmail($email)
-    {
-        return static::where('email',$email)->first();
+        return static::where('email',$email)->firstOrFail();;
     }
 }

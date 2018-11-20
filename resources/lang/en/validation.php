@@ -126,8 +126,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'custom_password' => [
+            'user' => 'The password must contain at least one : capital letter, small leter, digit.',
         ],
     ],
 
@@ -143,5 +143,7 @@ return [
     */
 
     'attributes' => [],
+
+
 
 ];

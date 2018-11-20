@@ -17,7 +17,7 @@ class AcEmailVerified implements AuthCondition {
         return $user->isEmailVerified();
     }
 
-    public static function message()
+    public static function message(User $user)
     {
         return Lang::get('authentication.email_confirmation');
     }

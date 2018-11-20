@@ -31,6 +31,12 @@ class RegistrationRequest extends FormRequest {
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'password.regex' => Lang('validation.custom.custom_password.user'),
+        ];
+    }
 
     /**
      * Extra validation rules

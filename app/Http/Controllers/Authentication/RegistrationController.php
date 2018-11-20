@@ -29,4 +29,19 @@ class RegistrationController extends Controller {
     {
         return $auth->authenticate($token);
     }
+
+    public function createResendToken()
+    {
+        return view("authentication.registration.emailConfirmationForm");
+    }
+
+    public function resendToken(AuthenticatesUser $auth,Request $request)
+    {
+        $this->validate($request,[
+            'email'=> 'required|email',
+        ]);
+
+        return $auth->invite($request,true);
+    }
+
 }

@@ -24,6 +24,10 @@ Route::get("/login", '\App\Http\Controllers\Authentication\SessionsController@cr
 Route::post("/login", '\App\Http\Controllers\Authentication\SessionsController@store');
 Route::get("/logout", '\App\Http\Controllers\Authentication\SessionsController@destroy')->name('logout');
 
+//This path is used in order to resend confirmation email
+Route::get("/login/resend", '\App\Http\Controllers\Authentication\RegistrationController@createResendToken')->name('login_confirmation');
+Route::post("/login/resend", '\App\Http\Controllers\Authentication\RegistrationController@resendToken');
+
 /* ***  Regular  *** */
 
 Route::get("/", '\App\Http\Controllers\HomeController@index')->name('home');

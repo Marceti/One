@@ -8,5 +8,5 @@ use App\User;
 interface AuthCondition {
     public static function handle(User $user);
 
-    public static function message();
+    public static function message(User $user);
 }

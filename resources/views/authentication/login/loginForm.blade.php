@@ -6,7 +6,7 @@
             <div class="col-lg-4">
             </div>
             <div class="col-lg-4">
-                <h1 class="h3 mb-3 font-weight-normal">Please Login</h1>
+                <h1 class="h3 mb-3 font-weight-normal">{{ Lang::get('authentication.please_login_header') }}</h1>
 
 
                 <form method="POST" action={{route('login')}}>
@@ -33,8 +33,14 @@
                             <input type="checkbox" name="remember-me"> Remember me
                         </label>
                     </div>
+
                 </form>
 
+                <p>
+                    {{ Lang::get('authentication.resend_link.message_1') }}
+                    <a href="{{URL::route('login_confirmation')}}">{{ Lang::get('authentication.resend_link.message_2') }}</a>
+                    {{ Lang::get('authentication.resend_link.message_3') }}
+                </p>
 
             </div>
             <div class="col-lg-4">

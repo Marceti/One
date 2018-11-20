@@ -13,10 +13,24 @@ return [
     |
     */
 
-    'already_confirmed' => 'This user :user is active',
-    'confirmation' => 'Thank you for your registration :user. Enjoy',
-    'please_confirm' => 'Thank you ! Now please confirm your email adress by accesing the link',
-    'credentials_check' => 'Please check your credentials',
-    'email_confirmation' => 'Please confirm your email adress , click on the link that was sent to your email adress',
+    //******* LoginForm ********
+
+    'resend_link'        => [
+        'message_1' => 'To resend confirmation email ',
+        'message_2' => 'click',
+        'message_3' => ' on this link'
+    ],
+    'please_login_header' => 'Please Login',
+
+    //******* EmailConfirmationForm ********
+
+    'resend_email_header' => 'Resending confirmation link',
+
+    //******* messages ********
+    'already_confirmed'  => 'This user :user is active',
+    'confirmation'       => 'Thank you for your registration :name. Enjoy',
+    'please_confirm'     => 'Thank you ! Now please confirm your email adress by accesing the link',
+    'credentials_check'  => 'User not found. Please check your credentials',
+    'email_confirmation' => 'Please confirm your email adress , click on the link that was sent to your email adress !',
 
 ];

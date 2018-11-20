@@ -28,10 +28,13 @@ Class AuthConditionsHandler {
 
         $message = [];
 
-        foreach ($conditions->getConditions() as $condition){
+        if ($user){
+            foreach ($conditions->getConditions() as $condition){
 
-            if (!(true && $condition::handle($user))){
-                $message[]=$condition::message();
+                if (!(true && $condition::handle($user))){
+                    $message[]=$condition::message($user);
+                }
+
             }
 
         }
