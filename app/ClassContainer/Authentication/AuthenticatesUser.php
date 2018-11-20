@@ -8,11 +8,10 @@
 
 namespace App\ClassContainer\Authentication;
 
-
-use App\Jobs\RegistrationEmailJob;
+use App\ClassContainer\Authentication\Conditions\AuthConditions;
+use App\ClassContainer\Authentication\Conditions\AuthConditionsHandler;
 use App\LoginToken;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
@@ -20,12 +19,21 @@ use App\ClassContainer\SessionManager;
 
 class AuthenticatesUser {
 
+    /**
+     * Extra conditions that a user should satisfy in order to be logged in
+     * @return AuthConditions
+     */
+    public function loginConditions()
+    {
+        $conditions = new AuthConditions();
+        // *************** Here you can add as many conditions as you want **************
 
-    private $authConditions = ['noExtraChecks', 'emailVerification'];
-    // $authConditions [] =[ , , ]
-    //                  noExtraChecks       :   no extra checks are necesary
-    //                  emailVerification   :   the user must have the email verified
-    //
+        $conditions->addEmailVerified();
+
+        //*******************************************************************************
+
+        return $conditions;
+    }
 
     /**
      * Invites the user by : creating user, creating token for this user, sending invite email with token link
@@ -75,7 +83,7 @@ class AuthenticatesUser {
     {
         $this->rememberUser($request);
 
-        return $this->loginAttempt($request);
+        return $this->loginAttempt($request, $this->loginConditions());
     }
 
     /**
@@ -123,11 +131,18 @@ class AuthenticatesUser {
         }
     }
 
-    private function loginAttempt($request)
+
+    /**
+     * Attempts to login the user if the extra-conditions pass and also user-password matches
+     * @param $request
+     * @param AuthConditions $conditions
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function loginAttempt($request, AuthConditions $conditions)
     {
         $user = User::byEmail($request->input('email'));
 
-        if ($user && $this->loginConditions($user))
+        if ($user && AuthConditionsHandler::handle($user, $conditions))
         {
             if (Auth::attempt($request->only(['email', 'password'])))
             {
@@ -135,42 +150,27 @@ class AuthenticatesUser {
             }
         };
 
-        SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
+        SessionManager::flashMessages($this->collectMessages($user,$conditions));
 
         return redirect()->route('login');
     }
 
-    private function loginConditions(User $user)
-    : bool
+
+    /**
+     * Extracts messages from unpassed conditions if exist, if not returns general message
+     * @param User $user
+     * @param AuthConditions $conditions
+     * @return array
+     */
+    private function collectMessages(User $user, AuthConditions $conditions)
     {
-        $conditionResult = true;
-
-        foreach ($this->authConditions as $condition)
+        if (count($messages = AuthConditionsHandler::getMessages($user, $conditions)) < 1)
         {
-            $conditionResult &= $this->loginCondition($user, $condition);
-        }
+            $messages[] = Lang::get('authentication.credentials_check');
+        };
 
-        return $conditionResult;
+        return $messages;
     }
-
-    private function loginCondition(User $user, $condition)
-    : bool
-    {
-        switch ($condition)
-        {
-            case "noExtraChecks":
-                return true;
-                break;
-
-            case "emailVerification":
-                return $user->isEmailVerified();
-                break;
-
-            default:
-                return false;
-        }
-    }
-
 
 }
 

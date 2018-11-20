@@ -61,7 +61,7 @@ class User extends Authenticatable
      * Checks if the user has email verified
      * @return bool
      */
-    public function isEmailVerified()
+    public function isEmailVerified() : bool
     {
         return true && $this->email_verified_at;
     }

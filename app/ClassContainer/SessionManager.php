@@ -9,27 +9,34 @@
 namespace App\ClassContainer;
 
 
-class sessionManager {
+class SessionManager {
 
-    public static function addKey($key,$message)
+    public static function addKey($key, $message)
     {
-        session([$key=>$message]);
+        session([$key => $message]);
 
     }
 
     public static function flashMessage($message)
     {
-        $messages=session('message');
-        $messages[]=$message;
+        $messages = session('message');
+        $messages[] = $message;
 
-        session()->flash('message',$messages);
+        session()->flash('message', $messages);
 
+    }
+
+    public static function flashMessages(array $messages)
+    {
+        foreach ($messages as $message){
+            static::flashMessage($message);
+        }
     }
 
     public static function rememberUser($credentials)
     {
-        static::addKey("user_email",$credentials['email']);
-        static::addKey("user_password",$credentials['password']);
+        static::addKey("user_email", $credentials['email']);
+        static::addKey("user_password", $credentials['password']);
     }
 
 
