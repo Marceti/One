@@ -20,7 +20,7 @@ class SessionManager {
     public static function flashMessage($message)
     {
         $messages = session('message');
-        $messages[] = $message;
+        if ($message) {$messages[] = $message;};
 
         session()->flash('message', $messages);
 

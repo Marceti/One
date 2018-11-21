@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 
 class RegistrationRequest extends FormRequest {
 
@@ -34,7 +35,7 @@ class RegistrationRequest extends FormRequest {
     public function messages()
     {
         return [
-            'password.regex' => Lang('validation.custom.custom_password.user'),
+            'password.regex' => Lang::get('validation.custom.custom_password.user'),
         ];
     }
 

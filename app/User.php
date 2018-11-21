@@ -73,7 +73,7 @@ class User extends Authenticatable
      * @return mixed
      * @throws \Exception
      */
-    public static function byEmail($email, $callBack = null )
+    public static function byEmail($email)
     {
         return static::where('email',$email)->firstOrFail();;
     }

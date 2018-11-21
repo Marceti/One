@@ -32,5 +32,6 @@ return [
     'please_confirm'     => 'Thank you ! Now please confirm your email adress by accesing the link',
     'credentials_check'  => 'User not found. Please check your credentials',
     'email_confirmation' => 'Please confirm your email adress , click on the link that was sent to your email adress !',
+    'wrong_password'  => 'Wrong Password !  Please try again with the correct one',
 
 ];

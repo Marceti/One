@@ -10,9 +10,11 @@ namespace App\ClassContainer\Authentication;
 
 use App\ClassContainer\Authentication\Conditions\AuthConditions;
 use App\ClassContainer\Authentication\Conditions\AuthConditionsHandler;
+use App\ClassContainer\RouterManager;
 use App\LoginToken;
 use App\User;
 use http\Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
@@ -37,30 +39,22 @@ class AuthenticatesUser {
     }
 
     /**
-     * Invites the user by : creating user, creating token for this user, sending invite email with token link
+     * Invites the user by : creating user or grabing user, creating token for this user, sending invite email with token link
      * @param bool $existing
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function invite($existing = false)
     {
-        //TODO: Aici aven doua conditii , daca existing = false : facem user nou, daca = true, incercam sa gasim userul, dar daca nu-l gasim : automat este 404 , si ar trebui sa prin exceptia
         try {$user = ( ! $existing ? $this->createUser() : User::byEmail(request('email')));}
-        catch (\Exception $e){
-            dd($e);
+        catch (ModelNotFoundException $e){
+           return RouterManager::redirectBack(Lang::get('authentication.credentials_check'));
         };
-
 
         $this->createToken($user)
             ->sendRegistrationEmail();
 
-        SessionManager::flashMessage(Lang::get('authentication.please_confirm'));
-
-        return redirect()->route('login');
-
-        SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
-
-        return redirect()->back();
+        return RouterManager::redirectToRouteName('login',Lang::get('authentication.please_confirm'));
     }
 
 
@@ -73,17 +67,11 @@ class AuthenticatesUser {
     {
         $user = $token->user;
 
-        if ($user->firstAuthentication())
-        {
-            $message = Lang::get('authentication.confirmation', ['name' => $user->name]);
-        } else
-        {
-            $message = Lang::get('authentication.already_confirmed', ['name' => $user->name]);
-        };
+        $message = ($user->firstAuthentication() ?
+            Lang::get('authentication.confirmation', ['name' => $user->name]) :
+            Lang::get('authentication.already_confirmed', ['name' => $user->name]));
 
-        SessionManager::flashMessage($message);
-
-        return redirect()->route('login');
+        return RouterManager::redirectToRouteName('login',$message);
     }
 
     /**
@@ -117,7 +105,7 @@ class AuthenticatesUser {
     {
         $this->rememberUser();
 
-        return User::Create(request()->only(['name', 'email', 'password']));
+        return User::create(request()->only(['name', 'email', 'password']));
     }
 
     /**
@@ -134,7 +122,7 @@ class AuthenticatesUser {
      */
     private function rememberUser()
     {
-        if ($request->has('remember-me'))
+        if (request()->has('remember-me'))
         {
             SessionManager::rememberUser(request()->only(['email', 'password']));
         }
@@ -148,9 +136,8 @@ class AuthenticatesUser {
      */
     private function loginAttempt(AuthConditions $conditions)
     {
-
         try
-        { $user = User::byEmail(request()('email'));
+        { $user = User::byEmail(request('email'));
         } catch (\Exception $e)
         {
             SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
@@ -159,15 +146,14 @@ class AuthenticatesUser {
 
         if (AuthConditionsHandler::handle($user, $conditions))
         {
+
             if (Auth::attempt(request()->only(['email', 'password'])))
             {
                 return redirect()->intended(request('home'));
             }
         };
 
-        SessionManager::flashMessages($this->collectMessages($user, $conditions));
-
-        return redirect()->route('login');
+        return RouterManager::redirectToRouteName('login',$this->collectMessages($user, $conditions));
     }
 
 
@@ -182,19 +168,11 @@ class AuthenticatesUser {
 
         if (count($messages = AuthConditionsHandler::getMessages($user, $conditions)) < 1)
         {
-            $messages[] = Lang::get('authentication.credentials_check');
+            $messages[] = Lang::get('authentication.wrong_password');
         };
 
         return $messages;
     }
-
-    private function redirectToRouteName($routeName, $flashMessage = null)
-    {
-        if ($flashMessage) {SessionManager::flashMessages($flashMessage);}
-
-        return redirect()->route('$routeName');
-    }
-
 
 }
 
