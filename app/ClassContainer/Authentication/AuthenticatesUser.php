@@ -45,7 +45,11 @@ class AuthenticatesUser {
     public function invite($existing = false)
     {
         //TODO: Aici aven doua conditii , daca existing = false : facem user nou, daca = true, incercam sa gasim userul, dar daca nu-l gasim : automat este 404 , si ar trebui sa prin exceptia
-        $user = ( ! $existing) ? $user = $this->createUser() : User::byEmail(request('email'));
+        try {$user = ( ! $existing ? $this->createUser() : User::byEmail(request('email')));}
+        catch (\Exception $e){
+            dd($e);
+        };
+
 
         $this->createToken($user)
             ->sendRegistrationEmail();
@@ -184,7 +188,12 @@ class AuthenticatesUser {
         return $messages;
     }
 
+    private function redirectToRouteName($routeName, $flashMessage = null)
+    {
+        if ($flashMessage) {SessionManager::flashMessages($flashMessage);}
 
+        return redirect()->route('$routeName');
+    }
 
 
 }
