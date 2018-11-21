@@ -22,7 +22,7 @@ class RegistrationController extends Controller {
 
     public function store(AuthenticatesUser $auth, RegistrationRequest $request)
     {
-        return $auth->invite($request);
+        return $auth->invite();
     }
 
     public function authenticate(AuthenticatesUser $auth, LoginToken $token)
@@ -41,7 +41,7 @@ class RegistrationController extends Controller {
             'email'=> 'required|email',
         ]);
 
-        return $auth->invite($request,true);
+        return $auth->invite(true);
     }
 
 }

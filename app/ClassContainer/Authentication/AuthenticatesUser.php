@@ -38,14 +38,14 @@ class AuthenticatesUser {
 
     /**
      * Invites the user by : creating user, creating token for this user, sending invite email with token link
-     * @param Request $request
+     * @param bool $existing
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function invite(Request $request, $existing = false)
+    public function invite($existing = false)
     {
         //TODO: Aici aven doua conditii , daca existing = false : facem user nou, daca = true, incercam sa gasim userul, dar daca nu-l gasim : automat este 404 , si ar trebui sa prin exceptia
-        $user = ( ! $existing) ? $user = $this->createUser($request) : User::byEmail($request->input('email'));
+        $user = ( ! $existing) ? $user = $this->createUser() : User::byEmail(request('email'));
 
         $this->createToken($user)
             ->sendRegistrationEmail();
@@ -84,14 +84,13 @@ class AuthenticatesUser {
 
     /**
      * Attempts to Log in the user
-     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function login(Request $request)
+    public function login()
     {
-        $this->rememberUser($request);
+        $this->rememberUser();
 
-        return $this->loginAttempt($request, $this->loginConditions());
+        return $this->loginAttempt($this->loginConditions());
     }
 
     /**
@@ -108,14 +107,13 @@ class AuthenticatesUser {
 
     /**
      * Saves the credentials if remember-me is on , and creates uconfirmed user
-     * @param $request
      * @return mixed
      */
-    private function createUser($request)
+    private function createUser()
     {
-        $this->rememberUser($request);
+        $this->rememberUser();
 
-        return User::Create($request->only(['name', 'email', 'password']));
+        return User::Create(request()->only(['name', 'email', 'password']));
     }
 
     /**
@@ -129,28 +127,26 @@ class AuthenticatesUser {
 
     /**
      * If checkbox , remembers the user in current session
-     * @param $request
      */
-    private function rememberUser($request)
+    private function rememberUser()
     {
         if ($request->has('remember-me'))
         {
-            SessionManager::rememberUser($request->only(['email', 'password']));
+            SessionManager::rememberUser(request()->only(['email', 'password']));
         }
     }
 
 
     /**
      * Attempts to login the user if the extra-conditions pass and also user-password matches
-     * @param $request
      * @param AuthConditions $conditions
      * @return \Illuminate\Http\RedirectResponse
      */
-    private function loginAttempt($request, AuthConditions $conditions)
+    private function loginAttempt(AuthConditions $conditions)
     {
 
         try
-        { $user = User::byEmail($request->input('email'));
+        { $user = User::byEmail(request()('email'));
         } catch (\Exception $e)
         {
             SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
@@ -159,7 +155,7 @@ class AuthenticatesUser {
 
         if (AuthConditionsHandler::handle($user, $conditions))
         {
-            if (Auth::attempt($request->only(['email', 'password'])))
+            if (Auth::attempt(request()->only(['email', 'password'])))
             {
                 return redirect()->intended(request('home'));
             }

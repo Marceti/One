@@ -21,7 +21,7 @@ class SessionsController extends Controller {
 
     public function store(LoginRequest $request, AuthenticatesUser $auth)
     {
-        return $auth->login($request);
+        return $auth->login();
     }
 
     public function destroy(AuthenticatesUser $auth)
