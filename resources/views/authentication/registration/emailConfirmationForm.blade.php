@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-lg btn btn-block">Login</button>
+                        <button type="submit" class="btn btn-primary btn-lg btn btn-block">Send Link</button>
                     </div>
 
                 </form>
