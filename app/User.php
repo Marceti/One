@@ -75,6 +75,6 @@ class User extends Authenticatable
      */
     public static function byEmail($email)
     {
-        return static::where('email',$email)->firstOrFail();;
+        return static::where('email',$email)->first();
     }
 }

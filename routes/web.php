@@ -12,6 +12,7 @@
 */
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 
 /* ***  Authentication  *** */
@@ -31,3 +32,4 @@ Route::post("/login/resend", '\App\Http\Controllers\Authentication\RegistrationC
 /* ***  Regular  *** */
 
 Route::get("/", '\App\Http\Controllers\HomeController@index')->name('home');
+

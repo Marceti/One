@@ -8,60 +8,43 @@
 
 namespace App\ClassContainer\Authentication;
 
-use App\ClassContainer\Authentication\Conditions\AuthConditions;
-use App\ClassContainer\Authentication\Conditions\AuthConditionsHandler;
-use App\ClassContainer\RouterManager;
+
 use App\LoginToken;
 use App\User;
-use http\Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use App\ClassContainer\SessionManager;
 
 class AuthenticatesUser {
 
-    /**
-     * Extra conditions that a user should satisfy in order to be logged in
-     * @return AuthConditions
-     */
-    public function loginConditions()
-    {
-        $conditions = new AuthConditions();
-        // *************** Here you can add as many conditions as you want **************
-
-        $conditions->addEmailVerified();
-
-        //*******************************************************************************
-
-        return $conditions;
-    }
 
     /**
      * Invites the user by : creating user or grabing user, creating token for this user, sending invite email with token link
      * @param bool $existing
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      * @throws \Exception
      */
     public function invite($existing = false)
     {
-        try {$user = ( ! $existing ? $this->createUser() : User::byEmail(request('email')));}
-        catch (ModelNotFoundException $e){
-           return RouterManager::redirectBack(Lang::get('authentication.credentials_check'));
-        };
+        $user = (! $existing ? $this->createUser() : User::byEmail(request('email')));
 
-        $this->createToken($user)
-            ->sendRegistrationEmail();
+        if ($user)
+        {
+            $this->createToken($user)
+                ->sendRegistrationEmail();
 
-        return RouterManager::redirectToRouteName('login',Lang::get('authentication.please_confirm'));
+            return redirect()->route('login')->with('message',Lang::get('authentication.please_confirm'));
+        }
+
+        return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
+
     }
-
 
     /**
      * Authenticates user with the given token
      * @param LoginToken $token
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function authenticate(LoginToken $token)
     {
@@ -71,23 +54,29 @@ class AuthenticatesUser {
             Lang::get('authentication.confirmation', ['name' => $user->name]) :
             Lang::get('authentication.already_confirmed', ['name' => $user->name]));
 
-        return RouterManager::redirectToRouteName('login',$message);
+        return redirect()->route('login')->with('message',$message);
+
     }
 
     /**
      * Attempts to Log in the user
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
+     * @throws \Exception
      */
     public function login()
     {
         $this->rememberUser();
 
-        return $this->loginAttempt($this->loginConditions());
+        $user = (request()->has('email') ? User::byEmail(request('email')):null);
+
+        if ($user)      {return $this->loginAttempt();}
+        else            {return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));}
+
     }
 
     /**
      * Logs out the user
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function logOut()
     {
@@ -131,47 +120,16 @@ class AuthenticatesUser {
 
     /**
      * Attempts to login the user if the extra-conditions pass and also user-password matches
-     * @param AuthConditions $conditions
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    private function loginAttempt(AuthConditions $conditions)
+    private function loginAttempt()
     {
-        try
-        { $user = User::byEmail(request('email'));
-        } catch (\Exception $e)
+        if (Auth::attempt(request()->only(['email', 'password'])))
         {
-            SessionManager::flashMessage(Lang::get('authentication.credentials_check'));
-            return redirect()->back();
+            return redirect()->intended(request('home'));
         }
 
-        if (AuthConditionsHandler::handle($user, $conditions))
-        {
-
-            if (Auth::attempt(request()->only(['email', 'password'])))
-            {
-                return redirect()->intended(request('home'));
-            }
-        };
-
-        return RouterManager::redirectToRouteName('login',$this->collectMessages($user, $conditions));
-    }
-
-
-    /**
-     * Extracts messages from unpassed conditions if exist, if not returns general message
-     * @param User $user
-     * @param AuthConditions $conditions
-     * @return array
-     */
-    private function collectMessages(User $user, AuthConditions $conditions)
-    {
-
-        if (count($messages = AuthConditionsHandler::getMessages($user, $conditions)) < 1)
-        {
-            $messages[] = Lang::get('authentication.wrong_password');
-        };
-
-        return $messages;
+        return redirect()->route('login')->withErrors(Lang::get('authentication.wrong_password'));
     }
 
 }

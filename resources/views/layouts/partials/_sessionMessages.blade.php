@@ -1,7 +1,5 @@
-@if (Session::has('message'))
-    @foreach(Session::get('message') as $message)
+@if (session()->has('message'))
     <div id="flash-message" class="alert alert-success" role="alert">
-        {{ $message }}
+        {{ session('message') }}
     </div>
-    @endforeach
 @endif

@@ -11,7 +11,8 @@ class SessionsController extends Controller {
 
     public function __construct()
     {
-        $this->middleware('guest', ['except' => 'destroy']);
+        $this->middleware('guest')-> except('destroy');
+        $this->middleware('email_verified')->only("store");
     }
 
     public function create()
