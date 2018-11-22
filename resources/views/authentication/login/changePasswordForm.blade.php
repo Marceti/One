@@ -8,24 +8,19 @@
         <div class="col-lg-4">
         </div>
         <div class="col-lg-4" >
-            <h1 class="h3 mb-3 font-weight-normal">Registration</h1>
+            <h1 class="h3 mb-3 font-weight-normal">{{ Lang::get('authentication.change_password_header') }}</h1>
 
-            <form method="POST" action="{{route('register')}}">
+            <form method="POST" action="{{route('change_password')}}">
 
                 {{csrf_field()}}
 
-
-
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" class="form-control" name="name" placeholder="Your Name Here" required>
-                </div>
+                <input type="hidden" name="remember_token" id="hiddenField" value={{$user->remember_token}} />
 
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="email" class="form-control" name="email" placeholder="Your Email Here" required>
+                    <input type="email" class="form-control" name="email" placeholder="Your Email Here" required
+                           value={{$user->email}}  disabled>
                 </div>
-
 
                 <div class="form-group">
                     <label for="password">Password:</label>
@@ -44,11 +39,10 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn btn-block">Register</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn btn-block">Change Password</button>
                 </div>
 
             </form>
-
 
 
         </div>
@@ -57,6 +51,4 @@
 
     </div>
 </div>
-
-
 @endsection

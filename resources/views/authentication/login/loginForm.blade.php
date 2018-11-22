@@ -24,23 +24,29 @@
                         <input type="password" class="form-control" name="password" placeholder="Your Password Here"
                                required value={{session('user_password')}}>
                     </div>
+
+                    <div class="checkbox mb-3">
+                        <label>
+                            <input type="checkbox" name="remember-me"> {{ Lang::get('authentication.remember_me') }}
+                        </label>
+                    </div>
+
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-lg btn btn-block">Login</button>
                     </div>
 
-                    <div class="checkbox mb-3">
-                        <label>
-                            <input type="checkbox" name="remember-me"> Remember me
-                        </label>
-                    </div>
-
                 </form>
+
+                <p>
+                    <a class="text-danger" href="{{URL::route('reset_password')}}">{{ Lang::get('authentication.forgot_password') }}</a>
+                </p>
 
                 <p>
                     {{ Lang::get('authentication.resend_link.message_1') }}
                     <a href="{{URL::route('login_confirmation')}}">{{ Lang::get('authentication.resend_link.message_2') }}</a>
                     {{ Lang::get('authentication.resend_link.message_3') }}
                 </p>
+
 
             </div>
             <div class="col-lg-4">

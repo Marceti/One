@@ -13,6 +13,14 @@ return [
     |
     */
 
+    //******* ChangePasswordForm ********
+    'change_password_header'=>'Change password',
+
+    //******* ResetPasswordForm ********
+    'reset_password_header'=>'Reset password',
+    'send_link_button'=>'Send',
+    'reset_password_message'=>'A was sent to this email address. Click on link to reset your password.',
+
     //******* LoginForm ********
 
     'resend_link'        => [
@@ -21,6 +29,10 @@ return [
         'message_3' => ' on this link'
     ],
     'please_login_header' => 'Please Login',
+    'remember_me'=>'Keep me signed in',
+    'forgot_password'=>'Forgot password ?',
+
+
 
     //******* EmailConfirmationForm ********
 
@@ -29,9 +41,9 @@ return [
     //******* messages ********
     'already_confirmed'  => 'This user is active',
     'confirmation'       => 'Thank you for your registration :name. Enjoy',
-    'please_confirm'     => 'Thank you ! Now please confirm your email adress by accesing the link',
+    'please_confirm'     => 'Thank you ! Now please confirm your email address by accessing the link',
     'credentials_check'  => 'User not found. Please check your credentials',
-    'email_confirmation' => 'Please confirm your email adress , click on the link that was sent to your email adress !',
+    'email_confirmation' => 'Please confirm your email address , click on the link that was sent to your email address !',
     'wrong_password'  => 'Wrong Password !  Please try again with the correct one',
     'logged_in'  => 'You are already Logged In',
 

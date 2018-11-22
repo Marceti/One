@@ -10,6 +10,7 @@ namespace App\ClassContainer\Authentication;
 
 
 use App\LoginToken;
+use App\ResetToken;
 use App\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -31,10 +32,10 @@ class AuthenticatesUser {
 
         if ($user)
         {
-            $this->createToken($user)
+            $this->createLoginToken($user)
                 ->sendRegistrationEmail();
 
-            return redirect()->route('login')->with('message',Lang::get('authentication.please_confirm'));
+            return redirect()->route('login')->with('message', Lang::get('authentication.please_confirm'));
         }
 
         return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
@@ -54,7 +55,7 @@ class AuthenticatesUser {
             Lang::get('authentication.confirmation', ['name' => $user->name]) :
             Lang::get('authentication.already_confirmed', ['name' => $user->name]));
 
-        return redirect()->route('login')->with('message',$message);
+        return redirect()->route('login')->with('message', $message);
 
     }
 
@@ -67,10 +68,16 @@ class AuthenticatesUser {
     {
         $this->rememberUser();
 
-        $user = (request()->has('email') ? User::byEmail(request('email')):null);
+        $user = (request()->has('email') ? User::byEmail(request('email')) : null);
 
-        if ($user)      {return $this->loginAttempt();}
-        else            {return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));}
+        if ($user)
+        {
+            return $this->loginAttempt();
+        }
+        else
+        {
+            return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
+        }
 
     }
 
@@ -87,6 +94,45 @@ class AuthenticatesUser {
 
 
     /**
+     * grabs the user with given email, for user creates new resetToken, sends the link on users email
+     * @return $this|RedirectResponse
+     * @throws \Exception
+     */
+    public function resetPassword()
+    {
+        if (request()->has('email'))
+        {
+
+            $user = User::byEmail(request('email'));
+
+            if ($user)
+            {
+
+                $this->createResetToken($user)
+                    ->sendResetEmail();
+
+                return redirect()->route('login')->with('message', Lang::get('authentication.reset_password_message'));
+            }
+
+            return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
+
+        }
+    }
+
+    /**
+     * For the returned token, grabs the user for this token and generates the view with to user remember_token
+     * @param ResetToken $token
+     * @return $this
+     */
+    public function createNewPasswordForm(ResetToken $token)
+    {
+        $user = $token->user;
+
+        return view("authentication.login.changePasswordForm",compact('user'));
+
+    }
+
+    /**
      * Saves the credentials if remember-me is on , and creates uconfirmed user
      * @return mixed
      */
@@ -101,9 +147,18 @@ class AuthenticatesUser {
      * @param $user
      * @return mixed
      */
-    private function createToken($user)
+    private function createLoginToken($user)
     {
         return LoginToken::generateFor($user);
+    }
+
+    /**
+     * @param $user
+     * @return mixed
+     */
+    private function createResetToken($user)
+    {
+        return ResetToken::generateFor($user);
     }
 
     /**

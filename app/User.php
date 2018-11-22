@@ -45,6 +45,15 @@ class User extends Authenticatable
     }
 
     /**
+     * One to One realtionship
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function resetToken()
+    {
+        return $this->hasOne('App\ResetToken');
+    }
+
+    /**
      * If user was already authenticated returns FALSE, otherwise will authenticate and return TRUE
      * @return bool
      */

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\RegistrationConfirmationEmail;
+use App\Mail\ResetPasswordEmail;
 use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Mail;
 
-class RegistrationEmailJob implements ShouldQueue
+class ResetPasswordEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
@@ -37,7 +37,7 @@ class RegistrationEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $url = url('register/token',$this->user->loginToken->token);
-        Mail::to($this->user)->send(new RegistrationConfirmationEmail($url));
+        $url = url('resetPassword/token',$this->user->resetToken->token);
+        Mail::to($this->user)->send(new ResetPasswordEmail($url));
     }
 }
