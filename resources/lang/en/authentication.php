@@ -16,10 +16,13 @@ return [
     //******* ChangePasswordForm ********
     'change_password_header'=>'Change password',
 
-    //******* ResetPasswordForm ********
+    //******* ResetPassword ********
+    'password_reset_successful' =>'Your password reset succeeded',
+    //Form
     'reset_password_header'=>'Reset password',
     'send_link_button'=>'Send',
     'reset_password_message'=>'A was sent to this email address. Click on link to reset your password.',
+
 
     //******* LoginForm ********
 
@@ -46,5 +49,6 @@ return [
     'email_confirmation' => 'Please confirm your email address , click on the link that was sent to your email address !',
     'wrong_password'  => 'Wrong Password !  Please try again with the correct one',
     'logged_in'  => 'You are already Logged In',
+    'log_out' => 'Logged out safely'
 
 ];

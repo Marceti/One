@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Authentication;
 
 use App\ClassContainer\Authentication\AuthenticatesUser;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\ResetToken;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -33,7 +34,7 @@ class SessionsController extends Controller {
      */
     public function store(LoginRequest $request, AuthenticatesUser $auth)
     {
-        return $auth->login();
+        return $auth->login($request);
     }
 
     /**
@@ -46,30 +47,46 @@ class SessionsController extends Controller {
         return $auth->logOut();
     }
 
+
+    /**
+     * Generates the view for the new password
+     * @param AuthenticatesUser $auth
+     * @param ResetToken $token
+     * @return AuthenticatesUser
+     */
     public function CreateNewPassword(AuthenticatesUser $auth, ResetToken $token)
     {
         return $auth->createNewPasswordForm($token);
     }
 
-    public function StoreNewPassword(AuthenticatesUser $auth)
+    /**
+     * @param AuthenticatesUser $auth
+     * @return
+     */
+    public function StoreNewPassword(ResetPasswordRequest $request, AuthenticatesUser $auth)
     {
-        //TODO: 1 IMPORTANT : Formul trimite datele aici si trebuie sa continui
-        //TODO: 2 Creaza un [ChangePasswordRequest $request] ca sa validezi inputul
-        //TODO: 3 Apeleaza [$auth->changePassword()] care va verifica daca request('remember_token') coincide cu userul
-        //TODO: 4 Daca inputul e valid , atunci modifica passwordul, si STERGE resetTokenul
-        
-        //return $auth->changePassword();
+        return $auth->changePassword($request);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function resetPasswordForm()
     {
         return view("authentication.login.resetPasswordForm");
     }
 
-    public function resetPassword(AuthenticatesUser $auth,Request $request)
+    /**
+     * @param AuthenticatesUser $auth
+     * @param Request $request
+     * @return $this|\Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function resetPassword(AuthenticatesUser $auth, Request $request)
     {
         $this->validate($request,[
-            'email'=> 'required|email',
+            'email'=> 'required|email|exists:users,email',
         ]);
 
         return $auth->resetPassword();

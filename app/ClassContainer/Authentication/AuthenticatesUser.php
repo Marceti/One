@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use App\ClassContainer\SessionManager;
+use PHPUnit\Framework\Exception;
 
 class AuthenticatesUser {
 
@@ -43,7 +44,7 @@ class AuthenticatesUser {
     }
 
     /**
-     * Authenticates user with the given token
+     * Authenticates user with the given Login token
      * @param LoginToken $token
      * @return RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -67,18 +68,7 @@ class AuthenticatesUser {
     public function login()
     {
         $this->rememberUser();
-
-        $user = (request()->has('email') ? User::byEmail(request('email')) : null);
-
-        if ($user)
-        {
             return $this->loginAttempt();
-        }
-        else
-        {
-            return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
-        }
-
     }
 
     /**
@@ -88,8 +78,7 @@ class AuthenticatesUser {
     public function logOut()
     {
         Auth::logout();
-
-        return redirect()->route('home');
+        return redirect()->route('home')->with('message', Lang::get('authentication.log_out'));
     }
 
 
@@ -100,23 +89,12 @@ class AuthenticatesUser {
      */
     public function resetPassword()
     {
-        if (request()->has('email'))
-        {
+        $user = User::byEmail(request('email'));
 
-            $user = User::byEmail(request('email'));
+        $this->createResetToken($user)
+            ->sendResetEmail();
 
-            if ($user)
-            {
-
-                $this->createResetToken($user)
-                    ->sendResetEmail();
-
-                return redirect()->route('login')->with('message', Lang::get('authentication.reset_password_message'));
-            }
-
-            return redirect()->back()->withErrors(Lang::get('authentication.credentials_check'));
-
-        }
+        return redirect()->route('login')->with('message', Lang::get('authentication.reset_password_message'));
     }
 
     /**
@@ -126,9 +104,24 @@ class AuthenticatesUser {
      */
     public function createNewPasswordForm(ResetToken $token)
     {
+
         $user = $token->user;
 
-        return view("authentication.login.changePasswordForm",compact('user'));
+        return view("authentication.login.changePasswordForm", compact('user'));
+
+    }
+
+
+    public function changePassword($request)
+    {
+
+        $user = User::byEmail(request('email'));
+
+        $user->changePassword($request);
+
+        $this->rememberUser();
+
+        return redirect()->route('login')->with('message', Lang::get('authentication.password_reset_successful'));
 
     }
 
@@ -139,8 +132,9 @@ class AuthenticatesUser {
     private function createUser()
     {
         $this->rememberUser();
-
-        return User::create(request()->only(['name', 'email', 'password']));
+        $credentials=request()->only(['name', 'email', 'password']);
+        $credentials['remember_token']=str_random(50);
+        return User::create($credentials);
     }
 
     /**
@@ -183,7 +177,6 @@ class AuthenticatesUser {
         {
             return redirect()->intended(request('home'));
         }
-
         return redirect()->route('login')->withErrors(Lang::get('authentication.wrong_password'));
     }
 

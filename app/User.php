@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password'
+        'name', 'email', 'password','remember_token'
     ];
 
     /**
@@ -77,7 +77,7 @@ class User extends Authenticatable
     }
 
     /**
-     * retreves user by email
+     * extracts user by email
      * @param $email
      * @return mixed
      * @throws \Exception
@@ -85,5 +85,17 @@ class User extends Authenticatable
     public static function byEmail($email)
     {
         return static::where('email',$email)->first();
+    }
+
+    public function changePassword($request)
+    {
+        if($this->remember_token=$request->input('remember_token') && $this->resetToken->token=$request->input('reset_token')){
+            $this->password=$request->input('password');
+            $this->remember_token=str_random(50);
+            $this->save();
+            $this->resetToken->delete();
+            return $this;
+        }
+        throw new Exception('Division by zero.');
     }
 }
